@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chi tiết sản phẩm</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Favicon -->
+    <link href="img/favicon.ico" rel="icon" />
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Playfair+Display:wght@700;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Icon Font Stylesheet -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+
+    <!-- Libraries Stylesheet -->
+    <link href="lib/animate/animate.min.css" rel="stylesheet" />
+    <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet" />
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- Template Stylesheet -->
+    <link href="css/style.css" rel="stylesheet" />
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Owl Carousel -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    ;
+    <style>
+      .product-img {
+        max-width: 100%;
+        height: auto;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+      }
+      .product-info h4,
+      .product-info p {
+        margin-bottom: 0.5rem;
+      }
+      .product-meta i {
+        color: green;
+        margin-right: 8px;
+      }
+      .price-range {
+        font-size: 1.5rem;
+        color: #28a745;
+        font-weight: bold;
+      }
+      .bonus-box {
+        background-color: #f8f9fa;
+        padding: 1rem;
+        border-left: 5px solid #198754;
+        margin-top: 1rem;
+
+        .fly-img {
+          position: absolute;
+          width: 50px;
+          height: 50px;
+          border-radius: 8px;
+          z-index: 1000;
+          transition: all 0.7s ease-in-out;
+          pointer-events: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar Start -->
+    <div class="container-fluid bg-white sticky-top">
+      <div class="container">
+        <nav class="navbar navbar-expand-lg bg-white navbar-light py-2 py-lg-0">
+          <a href="index.html" class="navbar-brand">
+            <img class="img-fluid" src="https://i.postimg.cc/Hxpz1r2L/logo-Photoroom.png" alt="Logo" />
+          </a>
+          <button
+            type="button"
+            class="navbar-toggler ms-auto me-0"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarCollapse"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <div class="navbar-nav ms-auto">
+              <a href="index.html" class="nav-item nav-link active">Trang chủ</a>
+              <a href="about.html" class="nav-item nav-link">Giới thiệu</a>
+              <!-- <a href="product.html" class="nav-item nav-link">Products</a> -->
+              <a href="store.html" class="nav-item nav-link">Cửa hàng</a>
+              <!-- <div class="nav-item dropdown">
+                <a
+                  href="#"
+                  class="nav-link dropdown-toggle"
+                  data-bs-toggle="dropdown"
+                  >Pages</a
+                >
+                <div class="dropdown-menu bg-light rounded-0 m-0">
+                  <a href="feature.html" class="dropdown-item">Features</a>
+                  <a href="blog.html" class="dropdown-item">Blog Article</a>
+                  <a href="testimonial.html" class="dropdown-item"
+                    >Testimonial</a
+                  >
+                  <a href="404.html" class="dropdown-item">404 Page</a>
+                </div>
+              </div> -->
+              <!-- <a href="contact.html" class="nav-item nav-link">Contact</a> -->
+            </div>
+            <!-- Search and Cart -->
+            <div class="d-flex align-items-center ms-3">
+              <!-- Search box -->
+              <form class="d-flex me-3" action="search.html" method="get">
+                <input
+                  class="form-control form-control-sm"
+                  type="text"
+                  name="q"
+                  placeholder="Tìm kiếm sản phẩm"
+                />
+                <button
+                  class="btn btn-sm btn-outline-primary ms-2"
+                  type="submit"
+                >
+                  <i class="fa fa-search"></i>
+                </button>
+              </form>
+
+              <!-- Cart icon -->
+              <a
+                href="#"
+                class="btn btn-sm position-relative"
+                data-bs-toggle="modal"
+                data-bs-target="#cartModal"
+                onclick="renderCartPopup()"
+              >
+                <i class="fa fa-shopping-cart" id="cart-icon"></i>
+                <span
+                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                  id="cart-count"
+                >
+                  0
+                </span>
+              </a>
+            </div>
+          </div>
+        </nav>
+      </div>
+    </div>
+    <!-- Navbar End -->
+
+    <!-- Modal Giỏ Hàng -->
+    <div
+      class="modal fade"
+      id="cartModal"
+      tabindex="-1"
+      aria-labelledby="cartModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="cartModalLabel">Giỏ hàng của bạn</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Đóng"
+            ></button>
+          </div>
+          <div class="modal-body" id="cart-modal-body">
+            <!-- Nội dung sản phẩm sẽ được JS chèn vào đây -->
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Đóng
+            </button>
+            <a href="#" id="checkoutBtn" class="btn btn-primary"
+              >Tiến hành thanh toán</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product detail -->
+    <div class="container py-5 store-item">
+      <div class="row g-4">
+        <!-- Hình ảnh -->
+        <div class="col-md-6">
+          <div class="text-center">
+            <img id="productImage" class="product-img img-fluid mb-3" alt="" />
+          </div>
+          <div class="d-flex justify-content-around text-center">
+            <div>
+              <i class="fas fa-leaf"></i>
+              <p>Nguyên liệu hữu cơ</p>
+            </div>
+            <div>
+              <i class="fas fa-atom"></i>
+              <p>Công nghệ sấy lạnh</p>
+            </div>
+            <div>
+              <i class="fas fa-truck"></i>
+              <p>Giao hàng toàn quốc</p>
+            </div>
+          </div>
+          <!-- <div class="bonus-box">
+            <h6><i class="fas fa-gift"></i> Ưu đãi theo tháng:</h6>
+            <ul class="mb-0">
+              <li>
+                Với hoá đơn 300k: tặng 01 gói gừng mật ong sấy dẻo + 01 bình
+                nước (không áp dụng Bột củ sen)
+              </li>
+              <li>
+                Với hoá đơn 600k: tặng 02 gói gừng mật ong sấy dẻo + 02 bình
+                nước + miễn phí ship
+              </li>
+              <li>
+                Với hoá đơn 1000k: tặng 01 hộp trà 159k + 02 gói gừng + 02 bình
+                nước + miễn phí ship
+              </li>
+            </ul>
+          </div> -->
+        </div>
+
+        <!-- Thông tin sản phẩm -->
+        <div class="col-md-6">
+          <h3 id="productName"></h3>
+          <p class="text-muted">
+            <a href="index.html">Trang chủ</a> /
+            <!-- <a href="product.html">Sản Phẩm</a> / -->
+            <span id="productNameLink"></span>
+          </p>
+          <p id="productPrice" class="price-range"></p>
+
+          <div class="mb-3 d-flex align-items-center">
+            <label class="form-label fw-bold me-3">Số lượng:</label>
+            <div class="input-group" style="width: 120px">
+              <button id="decreaseBtn" class="btn btn-outline-secondary">
+                -
+              </button>
+              <input
+                id="quantityInput"
+                type="text"
+                class="form-control text-center"
+                value="1"
+              />
+              <button id="increaseBtn" class="btn btn-outline-secondary">
+                +
+              </button>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <button
+              id="addToCartBtn"
+              class="btn btn-success me-2 add-to-cart-btn"
+            >
+              Thêm vào giỏ hàng
+            </button>
+            <button id="buyNowBtn" class="btn btn-warning">Mua ngay</button>
+          </div>
+
+          <div class="product-info">
+            <h5>Thông tin khác:</h5>
+            <p>
+              <strong>Tên sản phẩm:</strong>
+              <span id="productNameInfo">Đang tải...</span>
+            </p>
+
+            <p>
+              <strong>Thành phần:</strong>
+              <span id="productIngredientInfo">Đang tải...</span>
+            </p>
+            <p>
+              <strong>Công dụng:</strong>
+              <span id="productUsesInfo">Đang tải...</span>
+            </p>
+            <p><strong>Hướng dẫn sử dụng:</strong></p>
+            <p id="productUseInfo">Đang tải...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- About us -->
+    <!-- <div class="container-xxl py-5">
+      <div class="container">
+        <div class="row g-5">
+          <div class="col-lg-6">
+            <div class="row g-3">
+              <div class="col-6 text-end">
+                <img
+                  class="img-fluid bg-white w-100 mb-3 wow fadeIn"
+                  data-wow-delay="0.1s"
+                  src="img/about-1.jpg"
+                  alt=""
+                />
+                <img
+                  class="img-fluid bg-white w-50 wow fadeIn"
+                  data-wow-delay="0.2s"
+                  src="img/about-3.jpg"
+                  alt=""
+                />
+              </div>
+              <div class="col-6">
+                <img
+                  class="img-fluid bg-white w-50 mb-3 wow fadeIn"
+                  data-wow-delay="0.3s"
+                  src="img/about-4.jpg"
+                  alt=""
+                />
+                <img
+                  class="img-fluid bg-white w-100 wow fadeIn"
+                  data-wow-delay="0.4s"
+                  src="img/about-2.jpg"
+                  alt=""
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-6 wow fadeIn" data-wow-delay="0.5s">
+            <div class="section-title">
+              <p class="fs-5 fw-medium fst-italic text-primary">About Us</p>
+              <h1 class="display-6">
+                The success history of TEA House in 25 years
+              </h1>
+            </div>
+            <div class="row g-3 mb-4">
+              <div class="col-sm-4">
+                <img
+                  class="img-fluid bg-white w-100"
+                  src="img/about-5.jpg"
+                  alt=""
+                />
+              </div>
+              <div class="col-sm-8">
+                <h5>Our tea is one of the most popular drinks in the world</h5>
+                <p class="mb-0">
+                  Tempor erat elitr rebum at clita. Diam dolor diam ipsum sit.
+                  Aliqu diam amet diam et eos. Clita erat ipsum et lorem et sit
+                </p>
+              </div>
+            </div>
+            <div class="border-top mb-4"></div>
+            <div class="row g-3">
+              <div class="col-sm-8">
+                <h5>Daily use of a cup of tea is good for your health</h5>
+                <p class="mb-0">
+                  Tempor erat elitr rebum at clita. Diam dolor diam ipsum sit.
+                  Aliqu diam amet diam et eos. Clita erat ipsum et lorem et sit
+                </p>
+              </div>
+              <div class="col-sm-4">
+                <img
+                  class="img-fluid bg-white w-100"
+                  src="img/about-6.jpg"
+                  alt=""
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div> -->
+
+    <!-- Footer Start -->
+    <!-- <div
+      class="container-fluid bg-dark footer mt-5 py-5 wow fadeIn"
+      data-wow-delay="0.1s"
+    >
+      <div class="container py-5">
+        <div class="row g-5">
+          <div class="col-lg-3 col-md-6">
+            <h4 class="text-primary mb-4">Our Office</h4>
+            <p class="mb-2">
+              <i class="fa fa-map-marker-alt text-primary me-3"></i>123 Street,
+              New York, USA
+            </p>
+            <p class="mb-2">
+              <i class="fa fa-phone-alt text-primary me-3"></i>+012 345 67890
+            </p>
+            <p class="mb-2">
+              <i class="fa fa-envelope text-primary me-3"></i>info@example.com
+            </p>
+            <div class="d-flex pt-3">
+              <a class="btn btn-square btn-primary rounded-circle me-2" href=""
+                ><i class="fab fa-twitter"></i
+              ></a>
+              <a class="btn btn-square btn-primary rounded-circle me-2" href=""
+                ><i class="fab fa-facebook-f"></i
+              ></a>
+              <a class="btn btn-square btn-primary rounded-circle me-2" href=""
+                ><i class="fab fa-youtube"></i
+              ></a>
+              <a class="btn btn-square btn-primary rounded-circle me-2" href=""
+                ><i class="fab fa-linkedin-in"></i
+              ></a>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <h4 class="text-primary mb-4">Quick Links</h4>
+            <a class="btn btn-link" href="">About Us</a>
+            <a class="btn btn-link" href="">Contact Us</a>
+            <a class="btn btn-link" href="">Our Services</a>
+            <a class="btn btn-link" href="">Terms & Condition</a>
+            <a class="btn btn-link" href="">Support</a>
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <h4 class="text-primary mb-4">Business Hours</h4>
+            <p class="mb-1">Monday - Friday</p>
+            <h6 class="text-light">09:00 am - 07:00 pm</h6>
+            <p class="mb-1">Saturday</p>
+            <h6 class="text-light">09:00 am - 12:00 pm</h6>
+            <p class="mb-1">Sunday</p>
+            <h6 class="text-light">Closed</h6>
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <h4 class="text-primary mb-4">Newsletter</h4>
+            <p>Dolor amet sit justo amet elitr clita ipsum elitr est.</p>
+            <div class="position-relative w-100">
+              <input
+                class="form-control bg-transparent w-100 py-3 ps-4 pe-5"
+                type="text"
+                placeholder="Your email"
+              />
+              <button
+                type="button"
+                class="btn btn-primary py-2 position-absolute top-0 end-0 mt-2 me-2"
+              >
+                SignUp
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div> -->
+    <div class="container-fluid bg-dark footer mt-5 py-5 wow fadeIn" data-wow-delay="0.1s">
+        <div class="container py-5">
+            <div class="row g-5">
+                <div class="col-lg-3 col-md-6">
+                    <h4 class="text-primary mb-4">Cửa hàng</h4>
+                    <p class="mb-2"><i class="fa fa-map-marker-alt text-primary me-3"></i>Thạch Thất ,Hà Nội, Việt Nam</p>
+                    <p class="mb-2"><i class="fa fa-phone-alt text-primary me-3"></i>0342748026</p>
+                    <p class="mb-2"><i class="fa fa-envelope text-primary me-3"></i>herbazen@gmail.com</p>
+                    <div class="d-flex pt-3">
+                        <a class="btn btn-square btn-primary rounded-circle me-2" href="https://www.facebook.com/profile.php?id=61576901255690"><i class="fab fa-facebook-f" style="font-size: 20px;"></i></a>
+                        <a class="btn btn-square btn-primary rounded-circle me-2" href="https://www.tiktok.com/@herbazen8"><i class="fab fa-tiktok" style="font-size: 20px;"></i></a>
+                    </div>
+                </div>
+                <!-- <div class="col-lg-3 col-md-6">
+                    <h4 class="text-primary mb-4">Quick Links</h4>
+                    <a class="btn btn-link" href="">About Us</a>
+                    <a class="btn btn-link" href="">Contact Us</a>
+                    <a class="btn btn-link" href="">Our Services</a>
+                    <a class="btn btn-link" href="">Terms & Condition</a>
+                    <a class="btn btn-link" href="">Support</a>
+                </div> -->
+                <div class="col-lg-3 col-md-6">
+                    <h4 class="text-primary mb-4">Giờ hoạt động</h4>
+                    <p class="mb-1">Thứ 2 - Thứ 6</p>
+                    <h6 class="text-light">08:00 - 19:00</h6>
+                    <p class="mb-1">Thứ 7 - Chủ nhật</p>
+                    <h6 class="text-light">08:00 - 00:00</h6>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <!-- <h4 class="text-primary mb-4">Thư mời</h4>
+                    <p>Theo dõi chúng tôi để cập nhật tin tức về những dòng trà mới</p> -->
+                    <div class="position-relative w-100">
+                        <!-- <input class="form-control bg-transparent w-100 py-3 ps-4 pe-5" type="text" placeholder="Your email"> -->
+                        <a href="/tea-store-project/fe/TeaHouse-1.0.0/TeaHouse-1.0.0/login.html" type="button" style="background-color: #333;"
+              class="btn btn-primary py-2 position-absolute top-0 end-0 mt-2 me-2"></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Footer End -->
+
+    <!-- JavaScript Libraries -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="lib/wow/wow.min.js"></script>
+    <script src="lib/easing/easing.min.js"></script>
+    <script src="lib/waypoints/waypoints.min.js"></script>
+    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/productDetails.js"></script>
+  </body>
+</html>

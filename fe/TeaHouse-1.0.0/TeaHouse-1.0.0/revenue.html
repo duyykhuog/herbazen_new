@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quản Lý Doanh Thu</title>
+    <!-- Bootstrap CSS từ CDN -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome cho các biểu tượng -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <!-- Chart.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"
+    />
+    <style>
+      .sidebar {
+        width: 250px;
+        height: 100vh;
+        background: #222e3c;
+        color: white;
+        position: fixed;
+        padding: 20px;
+      }
+
+      .sidebar .logo {
+        font-size: 20px;
+        font-weight: bold;
+        padding: 10px;
+        text-align: center;
+        background: #1b2531;
+        border-radius: 5px;
+      }
+
+      .sidebar .nav-link {
+        color: white;
+        padding: 10px;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+      }
+
+      .sidebar .nav-link:hover,
+      .sidebar .nav-link.active {
+        background: #0d6efd;
+      }
+
+      .sidebar .nav-link i {
+        margin-right: 10px;
+      }
+
+      .container-fluid {
+        margin-left: 270px;
+        padding: 20px;
+      }
+
+      .card {
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        border: none;
+      }
+
+      .card-header {
+        background-color: #fff;
+        border-bottom: 1px solid #eee;
+        font-weight: 600;
+      }
+
+      .info-box {
+        padding: 15px;
+        border-radius: 5px;
+      }
+
+      .bg-info-light {
+        background-color: rgba(13, 202, 240, 0.1);
+      }
+
+      .bg-success-light {
+        background-color: rgba(25, 135, 84, 0.1);
+      }
+
+      .bg-warning-light {
+        background-color: rgba(255, 193, 7, 0.1);
+      }
+
+      .bg-danger-light {
+        background-color: rgba(220, 53, 69, 0.1);
+      }
+
+      .text-large {
+        font-size: 1.5rem;
+        font-weight: 600;
+      }
+
+      .dashboard-title {
+        font-weight: 700;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #f0f0f0;
+      }
+
+      .growth-indicator {
+        font-size: 0.9rem;
+        padding: 3px 8px;
+        border-radius: 20px;
+      }
+
+      .chart-container {
+        position: relative;
+        height: 300px;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="d-flex">
+      <div class="sidebar" th:fragment="headerNhanVien">
+        <div class="logo">Herbal Zent</div>
+        <nav class="nav flex-column">
+          <a href="productAdmin.html" class="nav-link">
+            <i class="bi bi-cart"></i> Danh sách mặt hàng
+          </a>
+          <a href="GuestOrder.html" class="nav-link">
+            <i class="bi bi-receipt"></i> Hóa đơn
+          </a>
+          <!-- <a href="category.html" class="nav-link">
+            <i class="bi bi-journal"></i> Danh mục
+          </a> -->
+          <a href="revenue.html" id="doanhThuBtn" class="nav-link active">
+            <i class="bi bi-bar-chart-line"></i> Doanh thu
+          </a>
+
+          <!-- Nút đăng xuất -->
+          <!-- Thông tin nhân viên -->
+          <div class="user-info d-flex align-items-center p-3 border-top">
+            <div class="me-2">
+              <i class="bi bi-person-circle fs-3 text-primary"></i>
+            </div>
+            <div>
+              <div id="user" class="fw-bold"></div>
+            </div>
+          </div>
+
+          <!-- Nút đăng xuất -->
+          <a
+            href="#"
+            id="logoutBtn"
+            class="nav-link text-danger border-top mt-2 pt-2"
+          >
+            <i class="bi bi-box-arrow-right"></i> Đăng xuất
+          </a>
+        </nav>
+      </div>
+
+      <div class="container-fluid">
+        <!-- Main Content -->
+        <div class="col-md-10 p-4">
+          <h2 class="dashboard-title">Quản Lý Doanh Thu</h2>
+
+          <!-- Bộ lọc thời gian -->
+          <!-- <div class="card mb-4">
+            <div class="card-header">
+              <i class="fas fa-filter me-2"></i> Bộ lọc thời gian
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="input-group">
+                    <input
+                      id="startDateInput"
+                      type="date"
+                      class="form-control"
+                      th:value="${endDate}"
+                    />
+                    <input
+                      id="endDateInput"
+                      type="date"
+                      class="form-control"
+                      th:value="${startDate}"
+                    />
+                    <a id="btnApDung" class="btn btn-primary" type="button"
+                      >Áp dụng</a
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div> -->
+
+          <!-- Tổng quan doanh thu -->
+          <div class="row" id="overviewStatistics">
+            <!-- Doanh thu tháng -->
+            <div class="col-xl-3 col-md-6 mb-4">
+              <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                  <div
+                    class="text-xs font-weight-bold text-success text-uppercase mb-1"
+                  >
+                    Doanh thu tháng này
+                  </div>
+                  <div
+                    class="h5 mb-0 font-weight-bold text-gray-800"
+                    id="doanhThuThang"
+                  >
+                    ...
+                  </div>
+                  <div id="tyLeDoanhThu" class="mt-2"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Số đơn hàng -->
+            <div class="col-xl-3 col-md-6 mb-4">
+              <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                  <div
+                    class="text-xs font-weight-bold text-primary text-uppercase mb-1"
+                  >
+                    Số đơn hàng tháng
+                  </div>
+                  <div
+                    class="h5 mb-0 font-weight-bold text-gray-800"
+                    id="soDonThang"
+                  >
+                    ...
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Số sản phẩm -->
+            <div class="col-xl-3 col-md-6 mb-4">
+              <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                  <div
+                    class="text-xs font-weight-bold text-warning text-uppercase mb-1"
+                  >
+                    Sản phẩm đã bán
+                  </div>
+                  <div
+                    class="h5 mb-0 font-weight-bold text-gray-800"
+                    id="soSanPhamThang"
+                  >
+                    ...
+                  </div>
+                  <div id="tyLeSoSanPham" class="mt-2"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Doanh thu trung bình -->
+            <div class="col-xl-3 col-md-6 mb-4">
+              <div class="card border-left-danger shadow h-100 py-2">
+                <div class="card-body">
+                  <div
+                    class="text-xs font-weight-bold text-danger text-uppercase mb-1"
+                  >
+                    Doanh thu TB đơn
+                  </div>
+                  <div
+                    class="h5 mb-0 font-weight-bold text-gray-800"
+                    id="doanhThuTB"
+                  >
+                    ...
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Biểu đồ trực quan -->
+          <div class="row">
+            <div class="col-md-8">
+              <div class="card">
+                <div
+                  class="card-header d-flex justify-content-between align-items-center"
+                >
+                  <i class="fas fa-chart-line me-2"></i> Doanh thu theo thời
+                  gian
+                </div>
+                <div class="card-body">
+                  <div class="chart-container">
+                    <canvas id="revenueChart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card">
+                <div class="card-header">
+                  <i class="fas fa-trophy me-2"></i> Top sản phẩm bán chạy
+                </div>
+                <div class="card-body">
+                  <div class="chart-container">
+                    <canvas id="topProductsChart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tình trạng đơn hàng -->
+          <div class="row mt-4">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-header">
+                  <i class="fas fa-shipping-fast me-2"></i> Tình trạng đơn hàng
+                </div>
+                <div class="card-body">
+                  <div class="row text-center mb-4">
+                    <div class="col-md-4">
+                      <div class="border rounded p-3">
+                        <h5>Tổng số đơn</h5>
+                        <h3 class="text-primary" id="soDonAllThang">0</h3>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="border rounded p-3">
+                        <h5>Đơn thành công</h5>
+                        <h3 class="text-success" id="soDonThanhCong">0</h3>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="border rounded p-3">
+                        <h5>Đơn bị hủy</h5>
+                        <h3 class="text-danger" id="soDonHuyThang">0</h3>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-8">
+                      <h5>Phân tích đơn hàng</h5>
+                      <div class="mb-1 d-flex justify-content-between">
+                        <span class="text-success" id="labelThanhCong"
+                          >Đơn hàng thành công: 0%</span
+                        >
+                        <span class="text-danger" id="labelHuy"
+                          >Đơn hàng bị hủy: 0%</span
+                        >
+                      </div>
+
+                      <div class="progress mb-3" style="height: 30px">
+                        <div
+                          class="progress-bar bg-success"
+                          id="barThanhCong"
+                          role="progressbar"
+                          style="width: 0%"
+                          aria-valuenow="0"
+                          aria-valuemin="0"
+                          aria-valuemax="100"
+                        ></div>
+                        <div
+                          class="progress-bar bg-danger"
+                          id="barHuy"
+                          role="progressbar"
+                          style="width: 0%"
+                          aria-valuenow="0"
+                          aria-valuemin="0"
+                          aria-valuemax="100"
+                        ></div>
+                        <div
+                          class="progress-bar bg-warning"
+                          id="barHoan"
+                          role="progressbar"
+                          style="width: 0%"
+                          aria-valuenow="0"
+                          aria-valuemin="0"
+                          aria-valuemax="100"
+                        ></div>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="chart-container">
+                        <canvas id="orderStatusChart"></canvas>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <input type="hidden" th:value="${startDate}" id="startDate" />
+    <input type="hidden" th:value="${endDate}" id="endDate" />
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Đăng xuất -->
+    <script>
+      document
+        .getElementById("logoutBtn")
+        .addEventListener("click", function (e) {
+          e.preventDefault();
+
+          // Xóa thông tin user khỏi localStorage và sessionStorage
+          sessionStorage.removeItem("user");
+
+          // (Nếu có cookie: xóa thủ công bằng cách đặt lại expired)
+          document.cookie =
+            "user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+          // Chuyển hướng về trang login
+          window.location.href = "login.html";
+        });
+    </script>
+
+    <!-- Đọc user từ cookie -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Ưu tiên lấy từ localStorage, nếu không thì lấy từ sessionStorage
+        const userData = sessionStorage.getItem("user");
+
+        if (userData) {
+          try {
+            const user = JSON.parse(userData);
+            document.getElementById("user").textContent =
+              user.fullName || user.username || "Nhân viên";
+          } catch (e) {
+            console.warn("Không thể parse dữ liệu user:", e);
+          }
+        } else {
+          window.location.href = "login.html";
+        }
+      });
+    </script>
+
+    <script>
+      const orderStatusCtx = document
+        .getElementById("orderStatusChart")
+        ?.getContext("2d");
+      function formatCurrency(num) {
+        return new Intl.NumberFormat("vi-VN", {
+          style: "currency",
+          currency: "VND",
+        }).format(num);
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        //         const token = localStorage.getItem("token");
+
+        //         if (!token) {
+        //           const currentUrl = window.location.href;
+        //           localStorage.setItem("redirectAfterLogin", currentUrl);
+        //           window.location.href = "/login";
+        //         }
+
+        const fullUrl = window.location.href;
+        if (pathname)
+          fetch("http://localhost:8080/countByStatus")
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error("Lỗi khi lấy số lượng hóa đơn");
+              }
+              return response.json();
+            })
+            .then((data) => {
+              // Cập nhật số lượng vào các span
+              document.getElementById("soDonAllThang").textContent =
+                data.delivered + data.canceled || 0;
+              document.getElementById("soDonThanhCong").textContent =
+                data.delivered || 0;
+              document.getElementById("soDonHuyThang").textContent =
+                data.canceled || 0;
+
+              document.getElementById("labelThanhCong").textContent =
+                "Đơn hàng thành công: " +
+                (data.delivered / (data.canceled + data.delivered).toFixed(1)) *
+                  100 +
+                "%";
+              document.getElementById("labelHuy").textContent =
+                "Đơn hàng bị hủy: " +
+                +(
+                  (data.canceled /
+                    (data.canceled + data.delivered).toFixed(1)) *
+                  100
+                ) +
+                "%";
+
+              document.getElementById("barThanhCong").style.width =
+                (data.delivered / (data.canceled + data.delivered).toFixed(1)) *
+                  100 +
+                "%";
+              document
+                .getElementById("barThanhCong")
+                .setAttribute("aria-valuenow", data.tyLeThanhCong);
+
+              document.getElementById("barHuy").style.width =
+                (data.canceled / (data.canceled + data.delivered).toFixed(1)) *
+                  100 +
+                "%";
+              document
+                .getElementById("barHuy")
+                .setAttribute("aria-valuenow", data.tyLeBiHuy);
+
+              new Chart(orderStatusCtx, {
+                type: "doughnut",
+                data: {
+                  labels: ["Thành công", "Bị hủy"],
+                  datasets: [
+                    {
+                      data: [data.delivered, data.canceled],
+                      backgroundColor: [
+                        "rgba(40, 167, 69, 0.7)",
+                        "rgba(220, 53, 69, 0.7)",
+                      ],
+                      borderWidth: 1,
+                    },
+                  ],
+                },
+                options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                },
+              });
+            })
+            .catch((error) => {
+              console.error("Lỗi khi tải số lượng đơn hàng:", error);
+            });
+        // Vẽ biểu đồ nếu cần (Chart.js)
+      });
+
+      fetch("http://localhost:8080/api/statistics/overview/current-month")
+        .then((res) => res.json())
+        .then((data) => {
+          document.getElementById("doanhThuThang").innerText = formatCurrency(
+            data.doanhThuThang
+          );
+          document.getElementById("soDonThang").innerText = data.soDonThang;
+          document.getElementById("soSanPhamThang").innerText =
+            data.soSanPhamThang;
+          document.getElementById("doanhThuTB").innerText = formatCurrency(
+            data.doanhThuTB
+          );
+        })
+        .catch((err) => {
+          console.error("Lấy dữ liệu thống kê thất bại:", err);
+        });
+    </script>
+
+    <!-- Script để khởi tạo các biểu đồ -->
+    <script>
+      //Tìm kiếm theo ngày
+      //       document
+      //         .getElementById("btnApDung")
+      //         .addEventListener("click", function () {
+      //           const startDate = document.getElementById("startDateInput").value;
+      //           const endDate = document.getElementById("endDateInput").value;
+
+      //           let url = "/nhan-vien/doanh-thu";
+
+      //           const params = new URLSearchParams();
+      //           if (startDate) params.append("startDate", startDate);
+      //           if (endDate) params.append("endDate", endDate);
+
+      //           if (params.toString()) {
+      //             url += "?" + params.toString();
+      //           }
+
+      //           // 👉 Chuyển trang tới controller cùng với tham số
+      //           window.location.href = url;
+      //         });
+      // Dữ liệu mẫu cho biểu đồ
+      document.addEventListener("DOMContentLoaded", function () {
+        // Biểu đồ doanh thu theo thời gian
+        const params = new URLSearchParams();
+        fetch("http://localhost:8080/api/statistics/doanh-thu-theo-thang")
+          .then((response) => response.json())
+          .then((data) => {
+            const revenueCtx = document
+              .getElementById("revenueChart")
+              .getContext("2d");
+            new Chart(revenueCtx, {
+              type: "line",
+              data: {
+                labels: [
+                  "T1",
+                  "T2",
+                  "T3",
+                  "T4",
+                  "T5",
+                  "T6",
+                  "T7",
+                  "T8",
+                  "T9",
+                  "T10",
+                  "T11",
+                  "T12",
+                ],
+                datasets: [
+                  {
+                    label: "Doanh thu (triệu VNĐ)",
+                    data: data.map((value) =>
+                      parseFloat((value / 1_000_000).toFixed(2))
+                    ), // chuyển về triệu VNĐ
+                    borderColor: "rgba(54, 162, 235, 1)",
+                    backgroundColor: "rgba(54, 162, 235, 0.1)",
+                    borderWidth: 2,
+                    tension: 0.3,
+                    fill: true,
+                  },
+                ],
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+              },
+            });
+          })
+          .catch((error) => {
+            console.error("Lỗi khi tải dữ liệu doanh thu:", error);
+          });
+
+        // Biểu đồ top sản phẩm bán chạy
+        fetch("http://localhost:8080/api/statistics/api/thong-ke/top-ban-chay")
+          .then((res) => res.json())
+          .then((response) => {
+            const data = response.data; // dùng data.map(...) được
+            const labels = data.map((item) => item.tenSanPham);
+            const values = data.map((item) => item.doanhThu);
+
+            const topProductsChart = new Chart(
+              document.getElementById("topProductsChart").getContext("2d"),
+              {
+                type: "bar",
+                data: {
+                  labels: labels,
+                  datasets: [
+                    {
+                      label: "Doanh thu (triệu VNĐ)",
+                      data: values,
+                      backgroundColor: [
+                        "rgba(255, 99, 132, 0.7)",
+                        "rgba(54, 162, 235, 0.7)",
+                        "rgba(255, 206, 86, 0.7)",
+                        "rgba(75, 192, 192, 0.7)",
+                        "rgba(153, 102, 255, 0.7)",
+                      ],
+                      borderWidth: 1,
+                    },
+                  ],
+                },
+                options: {
+                  indexAxis: "y",
+                  responsive: true,
+                  maintainAspectRatio: false,
+                },
+              }
+            );
+          });
+
+        // Biểu đồ trạng thái đơn hàng
+        const orderStatusCtx = document
+          .getElementById("orderStatusChart")
+          ?.getContext("2d");
+
+        if (orderStatusCtx) {
+          fetch(
+            "http://localhost:8080/api/statistics/api/thong-ke/trang-thai-don-hang?" +
+              params.toString()
+          )
+            .then((res) => res.json())
+            .then((data) => {
+              const thanhCong = data.thanhCong || 0;
+              const biHuy = data.biHuy || 0;
+              const tong = thanhCong + biHuy;
+
+              // Cập nhật số đơn vào HTML
+              document.getElementById("soDonThanhCong").textContent = thanhCong;
+              document.getElementById("soDonHuyThang").textContent = biHuy;
+              document.getElementById("soDonAllThang").textContent = tong;
+
+              // Tính phần trăm
+              const percentThanhCong =
+                tong === 0 ? 0 : ((thanhCong / tong) * 100).toFixed(1);
+              const percentHuy =
+                tong === 0 ? 0 : ((biHuy / tong) * 100).toFixed(1);
+
+              // Cập nhật label phần trăm
+              document.getElementById(
+                "labelThanhCong"
+              ).textContent = `Đơn hàng thành công: ${percentThanhCong}%`;
+              document.getElementById(
+                "labelHuy"
+              ).textContent = `Đơn hàng bị hủy: ${percentHuy}%`;
+
+              // Cập nhật thanh tiến trình
+              document.getElementById(
+                "barThanhCong"
+              ).style.width = `${percentThanhCong}%`;
+              document
+                .getElementById("barThanhCong")
+                .setAttribute("aria-valuenow", percentThanhCong);
+
+              document.getElementById("barHuy").style.width = `${percentHuy}%`;
+              document
+                .getElementById("barHuy")
+                .setAttribute("aria-valuenow", percentHuy);
+
+              // Nếu muốn, bạn có thể ẩn barHoan vì chưa dùng
+              document.getElementById("barHoan").style.width = `0%`;
+
+              // Biểu đồ doughnut
+              new Chart(orderStatusCtx, {
+                type: "doughnut",
+                data: {
+                  labels: ["Thành công", "Bị hủy"],
+                  datasets: [
+                    {
+                      data: [thanhCong, biHuy],
+                      backgroundColor: [
+                        "rgba(40, 167, 69, 0.7)",
+                        "rgba(220, 53, 69, 0.7)",
+                      ],
+                      borderWidth: 1,
+                    },
+                  ],
+                },
+                options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                },
+              });
+            })
+            .catch((error) =>
+              console.error("Lỗi khi tải dữ liệu trạng thái đơn hàng:", error)
+            );
+        }
+      });
+    </script>
+  </body>
+</html>

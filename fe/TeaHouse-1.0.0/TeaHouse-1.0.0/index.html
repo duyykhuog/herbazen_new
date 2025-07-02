@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>HerbaZen</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <meta content="" name="keywords" />
+  <meta content="" name="description" />
+    <style>
+        /* Chatbot Styles */
+        .chat-container {
+            display: none;
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 350px;
+            height: 500px;
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            flex-direction: column;
+            z-index: 1000;
+            overflow: hidden;
+            border: 1px solid #e0e0e0;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #9abf69, #7ba05b);
+            color: white;
+            padding: 16px 20px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 16px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        .message {
+            max-width: 85%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.4;
+            word-wrap: break-word;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            align-self: flex-end;
+            margin-left: auto;
+            border-bottom-right-radius: 6px;
+        }
+
+        .message.bot {
+            background: #ffffff;
+            color: #333333;
+            align-self: flex-start;
+            border: 1px solid #e9ecef;
+            border-bottom-left-radius: 6px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .message-label {
+            font-weight: 600;
+            font-size: 12px;
+            margin-bottom: 4px;
+            opacity: 0.8;
+        }
+
+        .message.user .message-label {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .message.bot .message-label {
+            color: #9abf69;
+        }
+
+        .message-content {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* Format bot responses */
+        .bot-response {
+            white-space: pre-wrap;
+        }
+
+        .bot-response h3 {
+            color: #9abf69;
+            font-size: 16px;
+            margin: 8px 0 6px 0;
+            font-weight: 600;
+        }
+
+        .bot-response h4 {
+            color: #7ba05b;
+            font-size: 14px;
+            margin: 6px 0 4px 0;
+            font-weight: 600;
+        }
+
+        .bot-response ul {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+
+        .bot-response li {
+            margin: 4px 0;
+            color: #555;
+        }
+
+        .bot-response strong {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .bot-response em {
+            color: #666;
+            font-style: italic;
+        }
+
+        .price-highlight {
+            background: linear-gradient(45deg, #fff3cd, #ffeaa7);
+            color: #856404;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            background: white;
+            border-top: 1px solid #e9ecef;
+            gap: 10px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .chat-input input:focus {
+            border-color: #9abf69;
+            box-shadow: 0 0 0 3px rgba(154, 191, 105, 0.1);
+        }
+
+        .chat-input button {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #9abf69, #7ba05b);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input button:hover {
+            background: linear-gradient(135deg, #7ba05b, #6b8f4f);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(154, 191, 105, 0.3);
+        }
+
+        .chat-input button:active {
+            transform: translateY(0);
+        }
+
+        /* Chatbot toggle button */
+        .chat-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            border: none;
+            background: linear-gradient(135deg, #9abf69, #7ba05b);
+            cursor: pointer;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            padding: 0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(154, 191, 105, 0.4);
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+
+        .chat-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(154, 191, 105, 0.5);
+        }
+
+        .chat-toggle:active {
+            transform: scale(1.05);
+        }
+
+        .chat-toggle img {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+            filter: brightness(0) invert(1);
+        }
+
+        /* Loading animation */
+        .typing-indicator {
+            display: none;
+            padding: 12px 16px;
+            background: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 18px;
+            border-bottom-left-radius: 6px;
+            align-self: flex-start;
+            max-width: 85%;
+        }
+
+        .typing-indicator.show {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .typing-dots span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #9abf69;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Responsive design */
+        @media (max-width: 480px) {
+            .chat-container {
+                width: calc(100vw - 20px);
+                height: calc(100vh - 100px);
+                right: 10px;
+                bottom: 80px;
+            }
+        }
+    </style>
+  <!-- Favicon -->
+  <link href="img/favicon.ico" rel="icon" />
+
+  <!-- Google Web Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Playfair+Display:wght@700;900&display=swap"
+    rel="stylesheet" />
+
+  <!-- Icon Font Stylesheet -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet" />
+  <!-- Font Awesome 6 CDN -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+
+  <!-- Libraries Stylesheet -->
+  <link href="lib/animate/animate.min.css" rel="stylesheet" />
+  <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet" />
+
+  <!-- Customized Bootstrap Stylesheet -->
+  <link href="css/bootstrap.min.css" rel="stylesheet" />
+
+  <!-- Template Stylesheet -->
+  <link href="css/style.css" rel="stylesheet" />
+  <link href="css/chatbot.css" rel="stylesheet" />
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <!-- Owl Carousel -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  ;
+</head>
+
+<body>
+  <!-- Spinner Start -->
+  <div id="spinner"
+    class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem"></div>
+  </div>
+  <!-- Spinner End -->
+
+  <!-- Navbar Start -->
+  <div class="container-fluid bg-white sticky-top">
+    <div class="container">
+      <nav class="navbar navbar-expand-lg bg-white navbar-light py-2 py-lg-0">
+        <a href="index.html" class="navbar-brand">
+          <img class="img-fluid" src="https://i.postimg.cc/Hxpz1r2L/logo-Photoroom.png" alt="Logo" />
+        </a>
+        <button type="button" class="navbar-toggler ms-auto me-0" data-bs-toggle="collapse"
+          data-bs-target="#navbarCollapse">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <div class="navbar-nav ms-auto">
+            <a href="index.html" class="nav-item nav-link active">Trang chủ</a>
+            <a href="about.html" class="nav-item nav-link">Giới thiệu</a>
+            <a href="store.html" class="nav-item nav-link">Cửa hàng</a>
+          </div>
+          <!-- Search and Cart -->
+          <div class="d-flex align-items-center ms-3">
+            <!-- Search box -->
+            <form class="d-flex me-3" action="search.html" method="get">
+              <input class="form-control form-control-sm" type="text" name="q" placeholder="Tìm kiếm..." />
+              <button class="btn btn-sm btn-outline-primary ms-2" type="submit">
+                <i class="fa fa-search"></i>
+              </button>
+            </form>
+
+            <!-- Cart icon -->
+            <a href="#" class="btn btn-sm position-relative" data-bs-toggle="modal" data-bs-target="#cartModal"
+              onclick="renderCartPopup()">
+              <i class="fa fa-shopping-cart" id="cart-icon"></i>
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                id="cart-count">
+                0
+              </span>
+            </a>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </div>
+  <!-- Navbar End -->
+
+  <!-- Modal Giỏ Hàng -->
+  <div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="cartModalLabel">Giỏ hàng của bạn</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        </div>
+        <div class="modal-body" id="cart-modal-body">
+          <!-- Nội dung sản phẩm sẽ được JS chèn vào đây -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            Đóng
+          </button>
+          <a href="#" id="checkoutBtn" class="btn btn-primary">Tiến hành thanh toán</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Carousel Start -->
+  <div class="container-fluid px-0 mb-5">
+    <div id="header-carousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
+      <div class="carousel-inner">
+        <div class="carousel-item active">
+          <img class="w-100" src="img/carousel-1.jpg" alt="Image" />
+          <div class="carousel-caption">
+            <div class="container">
+              <div class="row justify-content-center">
+                <div class="col-lg-7 text-center">
+                  <p class="fs-4 text-white animated zoomIn">
+                    Chào mừng tới <strong class="text-dark">HerbaZen</strong>
+                  </p>
+                  <h1 class="display-1 text-dark mb-4 animated zoomIn">
+                    Thanh lọc tư nhiên - Rạng ngời sắc Việt
+                  </h1>
+                  <a href="" class="btn btn-light rounded-pill py-3 px-5 animated zoomIn">Khám phá thêm</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="carousel-item">
+          <img class="w-100" src="img/carousel-2.jpg" alt="Image" />
+          <div class="carousel-caption">
+            <div class="container">
+              <div class="row justify-content-center">
+                <div class="col-lg-7 text-center">
+                  <p class="fs-4 text-white animated zoomIn">
+                    Chào mừng tới<strong class="text-dark">HerbaZen</strong>
+                  </p>
+                  <h1 class="display-1 text-dark mb-4 animated zoomIn">
+                    Thanh lọc tư nhiên - Rạng ngời sắc Việt
+                  </h1>
+                  <a href="" class="btn btn-light rounded-pill py-3 px-5 animated zoomIn">Khám phá thêm</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="carousel-control-prev" type="button" data-bs-target="#header-carousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#header-carousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
+    </div>
+  </div>
+  <!-- Carousel End -->
+
+  <!-- About Start -->
+  <div class="container-xxl py-5">
+    <div class="container">
+      <div class="row g-5">
+        <div class="col-lg-6">
+          <div class="row g-3">
+            <div class="col-6 text-end">
+              <img class="img-fluid bg-white w-100 mb-3 wow fadeIn" data-wow-delay="0.1s" src="img/about-1.webp" style="width:340px; height:425px;"
+                alt="" />
+              <img class="img-fluid bg-white w-50 wow fadeIn" data-wow-delay="0.2s" src="img/about-33.jpg" style="width:170px; height:212.5px;" alt="" />
+            </div>
+            <div class="col-6">
+              <img class="img-fluid bg-white w-50 mb-3 wow fadeIn" data-wow-delay="0.3s" src="img/about-44.jpg" style="width:170px; height:212.5px;" alt="" />
+              <img class="img-fluid bg-white w-100 wow fadeIn" data-wow-delay="0.4s" src="img/about-222.jpg" style="width:340px; height:425px;" alt="" />
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6 wow fadeIn" data-wow-delay="0.5s">
+          <div class="section-title">
+            <p class="fs-5 fw-medium fst-italic text-primary">Giới thiệu</p>
+            <h1 class="display-6">
+              HerbaZen - Thương hiệu trà thảo mộc hiện đại, hướng đến lối sống xanh và quan tâm đến sức khỏe
+            </h1>
+          </div>
+          <div class="row g-3 mb-4">
+            <div class="col-sm-4">
+              <img class="img-fluid bg-white w-100" src="img/about-5.jpg" alt="" />
+            </div>
+            <div class="col-sm-8">
+              <h5>Sứ mệnh kết nối thiên nhiên với cuộc sống hiện đại</h5>
+              <p class="mb-0">
+                HerbaZen cam kết mang đến những sản phẩm trà thảo mộc nguyên chất, được tuyển chọn kỹ lưỡng từ các vùng
+                nguyên liệu sạch, không chất bảo quản, an toàn và tốt cho sức khỏe.
+              </p>
+            </div>
+          </div>
+          <div class="border-top mb-4"></div>
+          <div class="row g-3">
+            <div class="col-sm-8">
+              <h5>Trách nhiệm trong việc kiến tạo một tương lai xanh</h5>
+              <p class="mb-0">
+                HerbaZen không ngừng đồng hành cùng cộng đồng nhân dân địa phương, giữ gìn giá trị truyền thống và kiến
+                tạo một tương lai xanh.
+              </p>
+            </div>
+            <div class="col-sm-4">
+              <img class="img-fluid bg-white w-100" src="img/about-6.jpg" alt="" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- About End -->
+
+  <!-- Products Start -->
+  <!-- HTML sản phẩm lấy từ BE -->
+  <div class="container-fluid product py-5 my-5">
+    <div class="container py-5">
+      <div class="section-title text-center mx-auto wow fadeInUp" data-wow-delay="0.1s" style="max-width: 500px">
+        <p class="fs-5 fw-medium fst-italic text-primary">Sản phẩm của chúng tôi</p>
+        <h1 class="display-6">
+          Món quà từ thiên nhiên cho sức khỏe của bạn
+        </h1>
+      </div>
+
+      <!-- Carousel sản phẩm: KHÔNG chèn sản phẩm cứng trong HTML -->
+      <div class="owl-carousel product-carousel wow fadeInUp" data-wow-delay="0.5s" id="productList">
+        <!-- JS sẽ chèn sản phẩm vào đây -->
+      </div>  
+    </div>
+  </div>
+  <style>
+   #productList img,
+.product-carousel img {
+    width: 100% !important;
+    height: 250px !important; /* Fixed height for ALL images */
+    object-fit: cover !important; /* Ensures images fill space properly */
+    object-position: center !important; /* Centers the image */
+    border-radius: 8px;
+    transition: transform 0.3s ease;
+}
+
+/* Owl Carousel specific targeting */
+.owl-carousel .owl-item img {
+    width: 100% !important;
+    height: 250px !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    display: block;
+}
+
+/* Hover effects */
+#productList img:hover,
+.product-carousel img:hover {
+    transform: scale(1.05);
+}
+
+/* If your JS creates containers with these classes */
+.product-image-container {
+    width: 100%;
+    height: 250px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #f8f9fa;
+}
+
+.product-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    #productList img,
+    .product-carousel img,
+    .owl-carousel .owl-item img,
+    .product-image-container {
+        height: 200px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    #productList img,
+    .product-carousel img,
+    .owl-carousel .owl-item img,
+    .product-image-container {
+        height: 180px !important;
+    }
+}
+</style>
+
+  <!-- Products End -->
+
+  <!-- Article Start -->
+  <!-- <div class="container-xxl py-5">
+      <div class="container">
+        <div class="row g-5">
+          <div class="col-lg-5 wow fadeIn" data-wow-delay="0.1s">
+            <img class="img-fluid" src="img/article.jpg" alt="" />
+          </div>
+          <div class="col-lg-6 wow fadeIn" data-wow-delay="0.5s">
+            <div class="section-title">
+              <p class="fs-5 fw-medium fst-italic text-primary">
+                Featured Acticle
+              </p>
+              <h1 class="display-6">The history of tea leaf in the world</h1>
+            </div>
+            <p class="mb-4">
+              Tempor erat elitr rebum at clita. Diam dolor diam ipsum sit. Aliqu
+              diam amet diam et eos. Clita erat ipsum et lorem et sit, sed stet
+              lorem sit clita duo justo magna dolore erat amet
+            </p>
+            <p class="mb-4">
+              Diam dolor diam ipsum sit. Aliqu diam amet diam et eos. Clita erat
+              ipsum et lorem et sit, sed stet lorem sit clita duo justo magna.
+              Tempor erat elitr rebum at clita.
+            </p>
+            <a href="" class="btn btn-primary rounded-pill py-3 px-5"
+              >Read More</a
+            >
+          </div>
+        </div>
+      </div>
+    </div> -->
+  <!-- Article End -->
+
+  <!-- Video Start -->
+  <!-- <div class="container-fluid video my-5">
+      <div class="container">
+        <div class="row g-0">
+          <div class="col-lg-6 py-5 wow fadeIn" data-wow-delay="0.1s">
+            <div class="py-5">
+              <h1 class="display-6 mb-4">
+                Tea is a drink of <span class="text-white">health</span> and
+                <span class="text-white">beauty</span>
+              </h1>
+              <h5 class="fw-normal lh-base fst-italic text-white mb-5">
+                Tempor erat elitr rebum at clita. Diam dolor diam ipsum sit.
+                Aliqu diam amet diam et eos. Clita erat ipsum et lorem et sit
+              </h5>
+              <div class="row g-4 mb-5">
+                <div class="col-sm-6">
+                  <div class="d-flex align-items-center">
+                    <div
+                      class="flex-shrink-0 btn-lg-square bg-white text-primary rounded-circle me-3"
+                    >
+                      <i class="fa fa-check"></i>
+                    </div>
+                    <span class="text-dark">Great tea assortment</span>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="d-flex align-items-center">
+                    <div
+                      class="flex-shrink-0 btn-lg-square bg-white text-primary rounded-circle me-3"
+                    >
+                      <i class="fa fa-check"></i>
+                    </div>
+                    <span class="text-dark">Spices & additives</span>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="d-flex align-items-center">
+                    <div
+                      class="flex-shrink-0 btn-lg-square bg-white text-primary rounded-circle me-3"
+                    >
+                      <i class="fa fa-check"></i>
+                    </div>
+                    <span class="text-dark">Unique accessories</span>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="d-flex align-items-center">
+                    <div
+                      class="flex-shrink-0 btn-lg-square bg-white text-primary rounded-circle me-3"
+                    >
+                      <i class="fa fa-check"></i>
+                    </div>
+                    <span class="text-dark">Good for health & beauty</span>
+                  </div>
+                </div>
+              </div>
+              <a class="btn btn-light rounded-pill py-3 px-5" href=""
+                >Explore More</a
+              >
+            </div>
+          </div>
+          <div class="col-lg-6 wow fadeIn" data-wow-delay="0.5s">
+            <div
+              class="h-100 d-flex align-items-center justify-content-center"
+              style="min-height: 300px"
+            >
+              <button
+                type="button"
+                class="btn-play"
+                data-bs-toggle="modal"
+                data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
+                data-bs-target="#videoModal"
+              >
+                <span></span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Video End -->
+
+  <!-- Video Modal Start -->
+  <div class="modal modal-video fade" id="videoModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content rounded-0">
+        <div class="modal-header">
+          <h3 class="modal-title" id="exampleModalLabel">Youtube Video</h3>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!-- 16:9 aspect ratio -->
+          <div class="ratio ratio-16x9">
+            <iframe class="embed-responsive-item" src="" id="video" allowfullscreen allowscriptaccess="always"
+              allow="autoplay"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
+  <!-- Video Modal End -->
+
+  <!-- Store Start -->
+  <!-- <div class="container-xxl py-5">
+      <div class="container">
+        <div
+          class="section-title text-center mx-auto wow fadeInUp"
+          data-wow-delay="0.1s"
+          style="max-width: 500px"
+        >
+          <p class="fs-5 fw-medium fst-italic text-primary">Online Store</p>
+          <h1 class="display-6">Want to stay healthy? Choose tea taste</h1>
+        </div>
+        <div
+          style="margin-bottom: 100px"
+          class="row g-4"
+          id="top3Products"
+        ></div>
+        <div class="col-12 text-center wow fadeInUp" data-wow-delay="0.1s">
+          <a href="store.html" class="btn btn-primary rounded-pill py-3 px-5"
+            >View More Products</a
+          >
+        </div>
+      </div>
+    </div> -->
+  <!-- Store End -->
+
+  <!-- Testimonial Start -->
+  <!-- <div class="container-fluid testimonial py-5 my-5">
+      <div class="container py-5">
+        <div
+          class="section-title text-center mx-auto wow fadeInUp"
+          data-wow-delay="0.1s"
+          style="max-width: 500px"
+        >
+          <p class="fs-5 fw-medium fst-italic text-white">Testimonial</p>
+          <h1 class="display-6">What our clients say about our tea</h1>
+        </div>
+        <div
+          class="owl-carousel testimonial-carousel wow fadeInUp"
+          data-wow-delay="0.5s"
+        >
+          <div class="testimonial-item p-4 p-lg-5">
+            <p class="mb-4">
+              Diam dolor diam ipsum sit. Aliqu diam amet diam et eos. Clita erat
+              ipsum et lorem et sit, sed stet lorem sit clita duo justo
+            </p>
+            <div class="d-flex align-items-center justify-content-center">
+              <img
+                class="img-fluid flex-shrink-0"
+                src="img/testimonial-1.jpg"
+                alt=""
+              />
+              <div class="text-start ms-3">
+                <h5>Client Name</h5>
+                <span class="text-primary">Profession</span>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial-item p-4 p-lg-5">
+            <p class="mb-4">
+              Diam dolor diam ipsum sit. Aliqu diam amet diam et eos. Clita erat
+              ipsum et lorem et sit, sed stet lorem sit clita duo justo
+            </p>
+            <div class="d-flex align-items-center justify-content-center">
+              <img
+                class="img-fluid flex-shrink-0"
+                src="img/testimonial-2.jpg"
+                alt=""
+              />
+              <div class="text-start ms-3">
+                <h5>Client Name</h5>
+                <span class="text-primary">Profession</span>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial-item p-4 p-lg-5">
+            <p class="mb-4">
+              Diam dolor diam ipsum sit. Aliqu diam amet diam et eos. Clita erat
+              ipsum et lorem et sit, sed stet lorem sit clita duo justo
+            </p>
+            <div class="d-flex align-items-center justify-content-center">
+              <img
+                class="img-fluid flex-shrink-0"
+                src="img/testimonial-3.jpg"
+                alt=""
+              />
+              <div class="text-start ms-3">
+                <h5>Client Name</h5>
+                <span class="text-primary">Profession</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div> -->
+  <!-- Testimonial End -->
+
+  <!-- Contact Start -->
+  <div class="container-xxl contact py-5">
+    <div class="container">
+      <div class="section-title text-center mx-auto wow fadeInUp" data-wow-delay="0.1s" style="max-width: 500px">
+        <p class="fs-5 fw-medium fst-italic text-primary">Liên lạc</p>
+        <h1 class="display-6">Liên lạc ngay</h1>
+      </div>
+      <div class="row justify-content-center wow fadeInUp" data-wow-delay="0.1s">
+        <div class="col-lg-8">
+          <p class="text-center mb-5">
+            Hãy liên lạc nếu bạn cần giúp đỡ
+          </p>
+          <div class="row g-5">
+            <div class="col-md-4 text-center wow fadeInUp" data-wow-delay="0.3s">
+              <div class="btn-square mx-auto mb-3">
+                <i class="fa fa-envelope fa-2x text-white"></i>
+              </div>
+              <p class="mb-2">herbazen@gmail.com</p>
+              <!-- <p class="mb-0">support@example.com</p> -->
+            </div>
+            <div class="col-md-4 text-center wow fadeInUp" data-wow-delay="0.4s">
+              <div class="btn-square mx-auto mb-3">
+                <i class="fa fa-phone fa-2x text-white"></i>
+              </div>
+              <p class="mb-2">0342748026</p>
+              <!-- <p class="mb-0">+012 345 67890</p> -->
+            </div>
+            <div class="col-md-4 text-center wow fadeInUp" data-wow-delay="0.5s">
+              <div class="btn-square mx-auto mb-3">
+                <i class="fa fa-map-marker-alt fa-2x text-white"></i>
+              </div>
+              <p class="mb-2">Thạch Thất ,Hà Nội</p>
+              <p class="mb-0">Việt Nam</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Contact Start -->
+
+  <!-- Footer Start -->
+  <!-- <div
+      class="container-fluid bg-dark footer mt-5 py-5 wow fadeIn"
+      data-wow-delay="0.1s"
+    >
+      <div class="container py-5">
+        <div class="row g-5">
+          <div class="col-lg-3 col-md-6">
+            <h4 class="text-primary mb-4">Our Office</h4>
+            <p class="mb-2">
+              <i class="fa fa-map-marker-alt text-primary me-3"></i>123 Street,
+              New York, USA
+            </p>
+            <p class="mb-2">
+              <i class="fa fa-phone-alt text-primary me-3"></i>+012 345 67890
+            </p>
+            <p class="mb-2">
+              <i class="fa fa-envelope text-primary me-3"></i>info@example.com
+            </p>
+            <div class="d-flex pt-3">
+              <a class="btn btn-square btn-primary rounded-circle me-2" href=""
+                ><i class="fab fa-twitter"></i
+              ></a>
+              <a class="btn btn-square btn-primary rounded-circle me-2" href=""
+                ><i class="fab fa-facebook-f"></i
+              ></a>
+              <a class="btn btn-square btn-primary rounded-circle me-2" href=""
+                ><i class="fab fa-youtube"></i
+              ></a>
+              <a class="btn btn-square btn-primary rounded-circle me-2" href=""
+                ><i class="fab fa-linkedin-in"></i
+              ></a>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <h4 class="text-primary mb-4">Quick Links</h4>
+            <a class="btn btn-link" href="">About Us</a>
+            <a class="btn btn-link" href="">Contact Us</a>
+            <a class="btn btn-link" href="">Our Services</a>
+            <a class="btn btn-link" href="">Terms & Condition</a>
+            <a class="btn btn-link" href="">Support</a>
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <h4 class="text-primary mb-4">Business Hours</h4>
+            <p class="mb-1">Monday - Friday</p>
+            <h6 class="text-light">09:00 am - 07:00 pm</h6>
+            <p class="mb-1">Saturday</p>
+            <h6 class="text-light">09:00 am - 12:00 pm</h6>
+            <p class="mb-1">Sunday</p>
+            <h6 class="text-light">Closed</h6>
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <h4 class="text-primary mb-4">Newsletter</h4>
+            <p>Dolor amet sit justo amet elitr clita ipsum elitr est.</p>
+            <div class="position-relative w-100">
+              <input
+                class="form-control bg-transparent w-100 py-3 ps-4 pe-5"
+                type="text"
+                placeholder="Your email"
+              />
+              <button
+                type="button"
+                class="btn btn-primary py-2 position-absolute top-0 end-0 mt-2 me-2"
+              >
+                SignUp
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div> -->
+  <div class="container-fluid bg-dark footer mt-5 py-5 wow fadeIn" data-wow-delay="0.1s">
+    <div class="container py-5">
+      <div class="row g-5">
+        <div class="col-lg-3 col-md-6">
+          <h4 class="text-primary mb-4">Cửa hàng</h4>
+          <p class="mb-2"><i class="fa fa-map-marker-alt text-primary me-3"></i>Thạch Thất ,Hà Nội, Việt Nam</p>
+          <p class="mb-2"><i class="fa fa-phone-alt text-primary me-3"></i>0342748026</p>
+          <p class="mb-2"><i class="fa fa-envelope text-primary me-3"></i>herbazen@gmail.com</p>
+          <div class="d-flex pt-3">
+            <!-- <a class="btn btn-square btn-primary rounded-circle me-2" href=""><i class="fab fa-twitter"></i></a> -->
+            <a class="btn btn-square btn-primary rounded-circle me-2" href="https://www.facebook.com/profile.php?id=61576901255690"><i class="fab fa-facebook-f" style="font-size: 20px;"></i></a>
+            <a class="btn btn-square btn-primary rounded-circle me-2" href="https://www.tiktok.com/@herbazen8"><i class="fab fa-tiktok"  style="font-size: 20px;"></i></a>
+            <!-- <a class="btn btn-square btn-primary rounded-circle me-2" href=""><i class="fab fa-linkedin-in"></i></a> -->
+          </div>
+        </div>
+        <!-- <div class="col-lg-3 col-md-6">
+                    <h4 class="text-primary mb-4">Quick Links</h4>
+                    <a class="btn btn-link" href="">About Us</a>
+                    <a class="btn btn-link" href="">Contact Us</a>
+                    <a class="btn btn-link" href="">Our Services</a>
+                    <a class="btn btn-link" href="">Terms & Condition</a>
+                    <a class="btn btn-link" href="">Support</a>
+                </div> -->
+        <div class="col-lg-3 col-md-6">
+          <h4 class="text-primary mb-4">Giờ hoạt động</h4>
+          <p class="mb-1">Thứ 2 - Thứ 6</p>
+          <h6 class="text-light">08:00 - 19:00 </h6>
+          <p class="mb-1">Thứ 7 - Chủ nhật</p>
+          <h6 class="text-light">08:00  - 00:00 </h6>
+        </div>
+        <div class="col-lg-3 col-md-6">
+          <!-- <h4 class="text-primary mb-4">Thư mời</h4>
+          <p>Theo dõi chúng tôi để cập nhật tin tức về những dòng trà mới</p> -->
+          <div class="position-relative w-100">
+            <!-- <input class="form-control bg-transparent w-100 py-3 ps-4 pe-5" type="text" placeholder="Your email"> -->
+            <a href="/tea-store-project/fe/TeaHouse-1.0.0/TeaHouse-1.0.0/login.html" type="button" style="background-color: #333;"
+              class="btn btn-primary py-2 position-absolute top-0 end-0 mt-2 me-2"></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Footer End -->
+
+  <!-- Copyright Start -->
+  <!-- <div class="container-fluid copyright py-4">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+          &copy; <a class="fw-medium" href="#">Your Site Name</a>, All Right
+          Reserved.
+        </div>
+        <div class="col-md-6 text-center text-md-end"> -->
+          <!--/*** This template is free as long as you keep the footer author’s credit link/attribution link/backlink. If you'd like to use the template without the footer author’s credit link/attribution link/backlink, you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". Thank you for your support. ***/-->
+          <!-- Designed By
+          <a class="fw-medium" href="https://htmlcodex.com">HTML Codex</a>
+          Distributed By
+          <a class="fw-medium" href="https://themewagon.com">ThemeWagon</a>
+        </div>
+      </div>
+    </div>
+  </div> -->
+  <!-- Copyright End -->
+
+  <!-- Nút mở chatbot -->
+    <!-- Nút mở chatbot -->
+    <button class="chat-toggle" onclick="toggleChat()">
+        <img src="https://i.postimg.cc/Hx8KCck1/images-Photoroom.png"  style="width: 50px; height: 50px;" alt="Chatbot Icon">
+    </button>
+
+    <!-- Khung chatbot -->
+    <div class="chat-container" id="chatContainer">
+        <div class="chat-header">
+            <div>🤖 Trợ lý ảo HerbaZen</div>
+        </div>
+        <div class="chat-messages" id="chatMessages"></div> 
+        <div class="typing-indicator" id="typingIndicator">
+            <div class="typing-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="userInput" placeholder="Nhập câu hỏi của bạn..." 
+                   onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()">Gửi</button>
+        </div>
+    </div>
+
+<script>
+        function toggleChat() {
+            const chatBot = document.getElementById("chatContainer");
+            const chatMessages = document.getElementById("chatMessages");
+            
+            if (chatBot.style.display === "flex") {
+                chatBot.style.display = "none";
+            } else {
+                chatBot.style.display = "flex";
+                if (chatMessages.innerHTML.trim() === "") {
+                    addMessage("bot", "Xin chào! Tôi là trợ lý ảo HerbaZen. Tôi có thể giúp bạn tìm hiểu về các sản phẩm trà thảo mộc và tư vấn sức khỏe. Bạn có câu hỏi gì không?");
+                }
+            }
+        }
+
+        const chatHistory = [];
+
+        function addMessage(type, content) {
+            const chatBox = document.getElementById("chatMessages");
+            const messageDiv = document.createElement("div");
+            messageDiv.className = `message ${type}`;
+            
+            if (type === "user") {
+                messageDiv.innerHTML = `
+                    <div class="message-label">Bạn</div>
+                    <div class="message-content">${escapeHtml(content)}</div>
+                `;
+            } else {
+                messageDiv.innerHTML = `
+                    <div class="message-label">HerbaZen</div>
+                    <div class="message-content bot-response">${formatBotResponse(content)}</div>
+                `;
+            }
+            
+            chatBox.appendChild(messageDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function formatBotResponse(text) {
+            // Escape HTML first
+            text = escapeHtml(text);
+            
+            // Format pricing
+            text = text.replace(/(\d+[.,]\d+\s*VNĐ|\d+\s*VNĐ)/g, '<span class="price-highlight">$1</span>');
+            
+            // Format headers with **text**
+            text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            
+            // Format emphasis with *text*
+            text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+            
+            // Format line breaks
+            text = text.replace(/\n/g, '<br>');
+            
+            // Format bullet points
+            text = text.replace(/^[-•]\s+(.+)$/gm, '<li>$1</li>');
+            text = text.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+            
+            return text;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showTypingIndicator() {
+            const indicator = document.getElementById("typingIndicator");
+            indicator.classList.add("show");
+            const chatBox = document.getElementById("chatMessages");
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            const indicator = document.getElementById("typingIndicator");
+            indicator.classList.remove("show");
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function sendMessage() {
+            const input = document.getElementById("userInput");
+            const message = input.value.trim();
+            if (message === "") return;
+
+            // Add user message
+            addMessage("user", message);
+            
+            // Clear input
+            input.value = "";
+            
+            // Show typing indicator
+            showTypingIndicator();
+
+            // Add to chat history
+            chatHistory.push({ role: "user", content: message });
+
+            // Send request to Spring Boot API
+            fetch("https://herbaltea-chatbot.onrender.com/v1/chat", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+              body: JSON.stringify({
+                message: {
+                  role: "user",
+                  content: message
+                },
+                context: chatHistory
+              }),
+            })
+            .then((response) => {
+                hideTypingIndicator();
+                if (!response.ok) throw new Error("Lỗi từ máy chủ.");
+                return response.text();
+            })
+            .then((reply) => {
+                addMessage("bot", reply);
+                chatHistory.push({ role: "assistant", content: reply });
+            })
+            .catch((error) => {
+                hideTypingIndicator();
+                addMessage("bot", "Xin lỗi, hệ thống đang gặp sự cố. Vui lòng thử lại sau ít phút.");
+                console.error("Error:", error);
+            });
+        }
+
+        // Auto-focus input when chat opens
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatContainer = document.getElementById('chatContainer');
+            const userInput = document.getElementById('userInput');
+            
+            // Observer to detect when chat opens
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.target.style.display === 'flex') {
+                        setTimeout(() => userInput.focus(), 100);
+                    }
+                });
+            });
+            
+            observer.observe(chatContainer, {
+                attributes: true,
+                attributeFilter: ['style']
+            });
+        });
+</script>
+
+
+  <!-- JavaScript Libraries -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="lib/wow/wow.min.js"></script>
+  <script src="lib/easing/easing.min.js"></script>
+  <script src="lib/waypoints/waypoints.min.js"></script>
+  <script src="lib/owlcarousel/owl.carousel.min.js"></script>
+
+  <!-- Template Javascript -->
+  <script src="js/main.js"></script>
+</body>
+
+</html>
